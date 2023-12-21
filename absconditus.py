@@ -70,11 +70,13 @@ def vigenere_cipher_encrypt(texto, palabra_clave):
 # ... (The rest of your functions)
 
 if __name__ == "__main__":
-# Generate a random Fernet key
-key = Fernet.generate_key()
+    # Generate a random Fernet key
+    key = Fernet.generate_key()
 
-# Print the key (you can save it for later use)
-print(key.decode())
+    # Print the key (you can save it for later use)
+    print(key.decode())
+
+    main()
 
 
     def guardar_a_archivo(contenido, nombre_archivo):
