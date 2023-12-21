@@ -1,5 +1,7 @@
 import subprocess
 import sys
+import os
+import mimetypes
 from colorama import Fore, Style
 from cryptography.fernet import Fernet
 
@@ -22,7 +24,6 @@ for paquete in paquetes_requeridos:
 try:
     import colorama
     from colorama import Fore, Style
-from cryptography.fernet import Fernet
 except ImportError:
     print("Colorama no está instalado y no se puede instalar automáticamente.")
     sys.exit(1)
@@ -66,44 +67,15 @@ def vigenere_cipher_encrypt(texto, palabra_clave):
             resultado.append(carácter)
     return ''.join(resultado)
 
-def vigenere_cipher_decrypt(texto, palabra_clave):
-    resultado = []
-    longitud_palabra_clave = len(palabra_clave)
-    for i, carácter in enumerate(texto):
-        if carácter.isalpha():
-            desplazamiento = ord(palabra_clave[i % longitud_palabra_clave].lower()) - ord('a')
-            if carácter.islower():
-                resultado.append(chr(((ord(carácter) - ord('a') - desplazamiento) % 26) + ord('a')))
-            else:
-                resultado.append(chr(((ord(carácter) - ord('A') - desplazamiento) % 26) + ord('A')))
-        else:
-            resultado.append(carácter)
-    return ''.join(resultado)
-
-def caesar_cipher(texto, desplazamiento, cifrar=True):
-    resultado = []
-    for carácter in texto:
-        if carácter.isalpha():
-            if carácter.islower():
-                resultado.append(chr(((ord(carácter) - ord('a') + desplazamiento) % 26) + ord('a')) if cifrar else chr(((ord(carácter) - ord('a') - desplazamiento) % 26) + ord('a')))
-            else:
-                resultado.append(chr(((ord(carácter) - ord('A') + desplazamiento) % 26) + ord('A')) if cifrar else chr(((ord(carácter) - ord('A') - desplazamiento) % 26) + ord('A')))
-        else:
-            resultado.append(carácter)
-    return ''.join(resultado)
-
-def reverse_cipher(texto, cifrar=True):
-    return texto[::-1] if cifrar else texto[::-1]
-
-
 # ... (The rest of your functions)
 
 if __name__ == "__main__":
-    # Generate a random Fernet key
-    key = Fernet.generate_key()
+# Generate a random Fernet key
+key = Fernet.generate_key()
 
-    # Print the key (you can save it for later use)
-    print(key)
+# Print the key (you can save it for later use)
+print(key.decode())
+
 
     def guardar_a_archivo(contenido, nombre_archivo):
         with open(nombre_archivo + ".txt", 'w') as archivo:
@@ -144,7 +116,7 @@ if __name__ == "__main__":
                 datos_archivo = archivo.read()
 
             # Cifrar el contenido del archivo
-            suite_cifrado = Fernet(contraseña)
+            suite_cifrado = Fernet(key)
             datos_cifrados = suite_cifrado.encrypt(datos_archivo)
 
             # Escribir el contenido cifrado en un nuevo archivo
@@ -300,16 +272,17 @@ if __name__ == "__main__":
 # ... (Continuation of your functions from Part 2)
 
 def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
+  
     try:
         # Leer el contenido cifrado del archivo
         with open(ruta_archivo, 'rb') as archivo:
             datos_cifrados = archivo.read()
 
         # Descifrar el contenido del archivo
-        suite_cifrado = Fernet(contraseña)
+        suite_cifrado = Fernet(key)
         datos_descifrados = suite_cifrado.decrypt(datos_cifrados)
 
-        # Escribir el contenido descifrado en un nuevo archiavo
+        # Escribir el contenido descifrado en un nuevo archivo
         with open(ruta_salida, 'wb') as archivo_descifrado:
             archivo_descifrado.write(datos_descifrados)
 
@@ -320,4 +293,4 @@ def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
 # ... (Continuation of your functions)
 
 if __name__ == "__main__":
-    main() 
+    main()
