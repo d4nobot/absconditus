@@ -1,10 +1,9 @@
-from cryptography.fernet import Fernet
 import subprocess
 import sys
 import os
 import mimetypes
 from colorama import Fore, Style
-import time  # Added for the animation
+from cryptography.fernet import Fernet  # Import Fernet for key generation
 
 # Función para instalar e importar un paquete de Python
 def install_and_import(paquete):
@@ -53,19 +52,6 @@ mensaje_bienvenida = r"""
 caja_mensaje_bienvenida = box_text(mensaje_bienvenida)
 print(caja_mensaje_bienvenida)
 
-# Add a simple text-based animation
-def simple_animation():
-    for _ in range(5):
-        os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal screen
-        caja_mensaje_bienvenida = box_text(mensaje_bienvenida)
-        print(caja_mensaje_bienvenida)
-        print(Fore.RED + "Animation Frame 1" + Style.RESET_ALL)
-        time.sleep(0.5)
-        os.system("cls" if os.name == "nt" else "clear")  # Clear the terminal screen
-        caja_mensaje_bienvenida = box_text(mensaje_bienvenida)
-        print(caja_mensaje_bienvenida)
-        print(Fore.GREEN + "Animation Frame 2" + Style.RESET_ALL)
-        time.sleep(0.5)
 # Implementa tus funciones de cifrado Vigenère aquí
 def vigenere_cipher_encrypt(texto, palabra_clave):
     resultado = []
@@ -81,44 +67,19 @@ def vigenere_cipher_encrypt(texto, palabra_clave):
             resultado.append(carácter)
     return ''.join(resultado)
 
-def vigenere_cipher_decrypt(encrypted_text, palabra_clave):
-    resultado = []
-    longitud_palabra_clave = len(palabra_clave)
-    for i, carácter in enumerate(encrypted_text):
-        if carácter.isalpha():
-            desplazamiento = ord(palabra_clave[i % longitud_palabra_clave].lower()) - ord('a')
-            if carácter.islower():
-                resultado.append(chr(((ord(carácter) - ord('a') - desplazamiento + 26) % 26) + ord('a')))
-            else:
-                resultado.append(chr(((ord(carácter) - ord('A') - desplazamiento + 26) % 26) + ord('A')))
-        else:
-            resultado.append(carácter)
-    return ''.join(resultado)
+# ... (The rest of your functions)
 
-# Implementa métodos de cifrado adicionales aquí
-def caesar_cipher(texto, desplazamiento, cifrar=True):
-    resultado = []
-    for carácter in texto:
-        if carácter.isalpha():
-            if carácter.islower():
-                if cifrar:
-                    resultado.append(chr(((ord(carácter) - ord('a') + desplazamiento) % 26) + ord('a')))
-                else:
-                    resultado.append(chr(((ord(carácter) - ord('a') - desplazamiento + 26) % 26) + ord('a')))
-            else:
-                if cifrar:
-                    resultado.append(chr(((ord(carácter) - ord('A') + desplazamiento) % 26) + ord('A')))
-                else:
-                    resultado.append(chr(((ord(carácter) - ord('A') - desplazamiento + 26) % 26) + ord('A')))
-        else:
-            resultado.append(carácter)
-    return ''.join(resultado)
+if __name__ == "__main__":
+    # Generate a random Fernet key
+    key = Fernet.generate_key()
 
-def reverse_cipher(texto, cifrar=True):
-    if cifrar:
-        return texto[::-1]  # Invertir el texto
-    else:
-        return texto[::-1]  # Invertir el texto (el descifrado es igual que el cifrado para el cifrado inverso)
+    # Print the key (you can save it for later use)
+    print(key)
+
+    main()  # Call the main function to run your program
+# ... (Previous code from Part 1)
+
+# ... (Continuation of your functions from Part 1)
 
 def guardar_a_archivo(contenido, nombre_archivo):
     with open(nombre_archivo + ".txt", 'w') as archivo:
@@ -146,6 +107,7 @@ def obtener_entrada_multilínea(prompt):
         else:
             break
     return '\n'.join(líneas)
+
 def leer_desde_archivo(ruta_archivo):
     with open(ruta_archivo, 'r') as archivo:
         return archivo.read()
@@ -169,24 +131,58 @@ def cifrar_archivo(ruta_archivo, ruta_salida, contraseña):
     except Exception as e:
         print(Fore.RED + "Error al cifrar el archivo: " + str(e) + Style.RESET_ALL)
 
-# Función para descifrar un archivo
-def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
-    try:
-        # Leer el contenido cifrado del archivo
-        with open(ruta_archivo, 'rb') as archivo_cifrado:
-            datos_cifrados = archivo_cifrado.read()
+# ... (Continuation of your functions)
 
-        # Descifrar el contenido del archivo
-        suite_cifrado = Fernet(contraseña)
-        datos_descifrados = suite_cifrado.decrypt(datos_cifrados)
+def main():
+    print(Fore.GREEN + "Elija una operación - 1 para Cifrar, 2 para Descifrar, 3 para Procesar Archivos:" + Style.RESET_ALL)
+    operación = int(input().strip())  # Convertir a entero
 
-        # Escribir el contenido descifrado en un nuevo archivo
-        with open(ruta_salida, 'wb') as archivo_descifrado:
-            archivo_descifrado.write(datos_descifrados)
+    if operación == 1 or operación == 2:
+        # Cifrar o descifrar texto
+        método_input = input(Fore.GREEN + "Ingrese el método de cifrado: vigenere, caesar, reverse" + Style.RESET_ALL)
+        if método_input not in ['vigenere', 'caesar', 'reverse']:
+            raise ValueError(Fore.RED + "Método desconocido: " + método_input + Style.RESET_ALL)
+        método = método_input
 
-        print(Fore.GREEN + "Archivo descifrado con éxito: " + ruta_salida + Style.RESET_ALL)
-    except Exception as e:
-        print(Fore.RED + "Error al descifrar el archivo: " + str(e) + Style.RESET_ALL)
+        texto = ''
+        if operación in [1, 2]:
+            print(Fore.GREEN + "Ingrese '1' para ingresar texto, '2' para leer desde un archivo:" + Style.RESET_ALL)
+            método_entrada = input().strip()
+
+            if método_entrada == '1':
+                texto = obtener_entrada_multilínea("Ingrese el texto (presione Enter dos veces para finalizar): ")
+            elif método_entrada == '2':
+                ruta_archivo = input(Fore.YELLOW + "Ingrese la ruta del archivo: " + Style.RESET_ALL)
+                texto = leer_desde_archivo(ruta_archivo)
+            else:
+                raise ValueError(Fore.RED + "Método de entrada no válido seleccionado." + Style.RESET_ALL)
+
+        palabra_clave = ''
+        if método == 'vigenere':
+            palabra_clave = input(Fore.YELLOW + "Ingrese la palabra clave: " + Style.RESET_ALL)
+
+        # Declaración de impresión de depuración
+        print(f"Depuración: Operación seleccionada es {operación}, Método seleccionado es '{método}'")
+
+        resultado = ''
+        if operación == 1:
+            resultado = encrypt_decrypt(texto, método, palabra_clave, True)
+        elif operación == 2:
+            resultado = encrypt_decrypt(texto, método, palabra_clave, False)
+        else:
+            raise ValueError(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
+
+        print(Fore.MAGENTA + "\nResultado:\n" + resultado + Style.RESET_ALL)
+
+        if input(Fore.CYAN + "¿Desea guardar el resultado en un archivo? (s/n): " + Style.RESET_ALL).lower() == 's':
+            nombre_archivo = input(Fore.YELLOW + "Ingrese el nombre de archivo para guardar la salida: " + Style.RESET_ALL)
+            guardar_a_archivo(resultado, nombre_archivo)
+
+if __name__ == "__main__":
+    main()
+# ... (Previous code from Part 2)
+
+# ... (Continuation of your functions from Part 2)
 
 def procesar_archivos():
     print(Fore.GREEN + "Ingrese la operación - 1 para Cifrar, 2 para Descifrar:" + Style.RESET_ALL)
