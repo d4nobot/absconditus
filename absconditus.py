@@ -67,139 +67,75 @@ def vigenere_cipher_encrypt(texto, palabra_clave):
             resultado.append(carácter)
     return ''.join(resultado)
 
-# ... (The rest of your functions)
+# Continúa con el resto de tus funciones
+# ... (Continuación de tus funciones desde la Parte 1)
 
-if __name__ == "__main__":
-    # Generate a random Fernet key
-    key = Fernet.generate_key()
+def guardar_a_archivo(contenido, nombre_archivo):
+    with open(nombre_archivo + ".txt", 'w') as archivo:
+        archivo.write(contenido)
+    print(Fore.GREEN + "Salida guardada en " + nombre_archivo + ".txt" + Style.RESET_ALL)
 
-    # Print the key (you can save it for later use)
-    print(key.decode())
+def encrypt_decrypt(texto, método, palabra_clave=None, cifrar=True):
+    if método == 'vigenere':
+        return vigenere_cipher_encrypt(texto, palabra_clave) if cifrar else vigenere_cipher_decrypt(texto, palabra_clave)
+    elif método == 'caesar':
+        desplazamiento = int(input(Fore.YELLOW + "Ingrese el valor de desplazamiento: " + Style.RESET_ALL))
+        return caesar_cipher(texto, desplazamiento, cifrar)
+    elif método == 'reverse':
+        return reverse_cipher(texto, cifrar)
+    else:
+        raise ValueError(Fore.RED + "Método desconocido: " + método + Style.RESET_ALL)
 
-    main()
-
-
-    def guardar_a_archivo(contenido, nombre_archivo):
-        with open(nombre_archivo + ".txt", 'w') as archivo:
-            archivo.write(contenido)
-        print(Fore.GREEN + "Salida guardada en " + nombre_archivo + ".txt" + Style.RESET_ALL)
-
-    def encrypt_decrypt(texto, método, palabra_clave=None, cifrar=True):
-        if método == 'vigenere':
-            return vigenere_cipher_encrypt(texto, palabra_clave) if cifrar else vigenere_cipher_decrypt(texto, palabra_clave)
-        elif método == 'caesar':
-            desplazamiento = int(input(Fore.YELLOW + "Ingrese el valor de desplazamiento: " + Style.RESET_ALL))
-            return caesar_cipher(texto, desplazamiento, cifrar)
-        elif método == 'reverse':
-            return reverse_cipher(texto, cifrar)
+def obtener_entrada_multilínea(prompt):
+    print(Fore.YELLOW + prompt + Style.RESET_ALL)
+    líneas = []
+    while True:
+        línea = input()
+        if línea:
+            líneas.append(línea)
         else:
-            raise ValueError(Fore.RED + "Método desconocido: " + método + Style.RESET_ALL)
+            break
+    return '\n'.join(líneas)
 
-    def obtener_entrada_multilínea(prompt):
-        print(Fore.YELLOW + prompt + Style.RESET_ALL)
-        líneas = []
-        while True:
-            línea = input()
-            if línea:
-                líneas.append(línea)
-            else:
-                break
-        return '\n'.join(líneas)
+def leer_desde_archivo(ruta_archivo):
+    with open(ruta_archivo, 'r') as archivo:
+        return archivo.read()
 
-    def leer_desde_archivo(ruta_archivo):
-        with open(ruta_archivo, 'r') as archivo:
-            return archivo.read()
+def cifrar_archivo(ruta_archivo, ruta_salida, contraseña):
+    try:
+        # Leer el contenido del archivo
+        with open(ruta_archivo, 'rb') as archivo:
+            datos_archivo = archivo.read()
 
-    # Función para cifrar un archivo
-    def cifrar_archivo(ruta_archivo, ruta_salida, contraseña):
-        try:
-            # Leer el contenido del archivo
-            with open(ruta_archivo, 'rb') as archivo:
-                datos_archivo = archivo.read()
+        # Cifrar el contenido del archivo
+        suite_cifrado = Fernet(key)
+        datos_cifrados = suite_cifrado.encrypt(datos_archivo)
 
-            # Cifrar el contenido del archivo
-            suite_cifrado = Fernet(key)
-            datos_cifrados = suite_cifrado.encrypt(datos_archivo)
+        # Escribir el contenido cifrado en un nuevo archivo
+        with open(ruta_salida, 'wb') as archivo_cifrado:
+            archivo_cifrado.write(datos_cifrados)
 
-            # Escribir el contenido cifrado en un nuevo archivo
-            with open(ruta_salida, 'wb') as archivo_cifrado:
-                archivo_cifrado.write(datos_cifrados)
+        print(Fore.GREEN + "Archivo cifrado con éxito: " + ruta_salida + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + "Error al cifrar el archivo: " + str(e) + Style.RESET_ALL)
 
-            print(Fore.GREEN + "Archivo cifrado con éxito: " + ruta_salida + Style.RESET_ALL)
-        except Exception as e:
-            print(Fore.RED + "Error al cifrar el archivo: " + str(e) + Style.RESET_ALL)
+def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
+    try:
+        # Leer el contenido cifrado del archivo
+        with open(ruta_archivo, 'rb') as archivo:
+            datos_cifrados = archivo.read()
 
-    def procesar_archivos():
-        print(Fore.GREEN + "Ingrese la operación - 1 para Cifrar, 2 para Descifrar:" + Style.RESET_ALL)
-        operación = int(input().strip())  # Convertir a entero
+        # Descifrar el contenido del archivo
+        suite_cifrado = Fernet(key)
+        datos_descifrados = suite_cifrado.decrypt(datos_cifrados)
 
-        contraseña = input(Fore.YELLOW + "Ingrese la contraseña para cifrar/descifrar el archivo: " + Style.RESET_ALL)
+        # Escribir el contenido descifrado en un nuevo archivo
+        with open(ruta_salida, 'wb') as archivo_descifrado:
+            archivo_descifrado.write(datos_descifrados)
 
-        if operación == 1:
-            # Cifrar archivo
-            ruta_archivo = input(Fore.YELLOW + "Ingrese la ruta del archivo para cifrar: " + Style.RESET_ALL)
-            ruta_salida = input(Fore.YELLOW + "Ingrese la ruta para guardar el archivo cifrado: " + Style.RESET_ALL)
-            cifrar_archivo(ruta_archivo, ruta_salida, contraseña)
-        elif operación == 2:
-            # Descifrar archivo
-            ruta_archivo = input(Fore.YELLOW + "Ingrese la ruta del archivo para descifrar: " + Style.RESET_ALL)
-            ruta_salida = input(Fore.YELLOW + "Ingrese la ruta para guardar el archivo descifrado: " + Style.RESET_ALL)
-            descifrar_archivo(ruta_archivo, ruta_salida, contraseña)
-        else:
-            print(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
-
-    def main():
-        print(Fore.GREEN + "Elija una operación - 1 para Cifrar, 2 para Descifrar, 3 para Procesar Archivos:" + Style.RESET_ALL)
-        operación = int(input().strip())  # Convertir a entero
-
-        if operación == 1 or operación == 2:
-            # Cifrar o descifrar texto
-            método_input = input(Fore.GREEN + "Ingrese el método de cifrado: vigenere, caesar, reverse" + Style.RESET_ALL)
-            if método_input not in ['vigenere', 'caesar', 'reverse']:
-                raise ValueError(Fore.RED + "Método desconocido: " + método_input + Style.RESET_ALL)
-            método = método_input
-
-            texto = ''
-            if operación in [1, 2]:
-                print(Fore.GREEN + "Ingrese '1' para ingresar texto, '2' para leer desde un archivo:" + Style.RESET_ALL)
-                método_entrada = input().strip()
-
-                if método_entrada == '1':
-                    texto = obtener_entrada_multilínea("Ingrese el texto (presione Enter dos veces para finalizar): ")
-                elif método_entrada == '2':
-                    ruta_archivo = input(Fore.YELLOW + "Ingrese la ruta del archivo: " + Style.RESET_ALL)
-                    texto = leer_desde_archivo(ruta_archivo)
-                else:
-                    raise ValueError(Fore.RED + "Método de entrada no válido seleccionado." + Style.RESET_ALL)
-
-            palabra_clave = ''
-            if método == 'vigenere':
-                palabra_clave = input(Fore.YELLOW + "Ingrese la palabra clave: " + Style.RESET_ALL)
-
-            resultado = ''
-            if operación == 1:
-                resultado = encrypt_decrypt(texto, método, palabra_clave, True)
-            elif operación == 2:
-                resultado = encrypt_decrypt(texto, método, palabra_clave, False)
-            else:
-                raise ValueError(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
-
-            print(Fore.MAGENTA + "\nResultado:\n" + resultado + Style.RESET_ALL)
-
-            if input(Fore.CYAN + "¿Desea guardar el resultado en un archivo? (s/n): " + Style.RESET_ALL).lower() == 's':
-                nombre_archivo = input(Fore.YELLOW + "Ingrese el nombre de archivo para guardar la salida: " + Style.RESET_ALL)
-                guardar_a_archivo(resultado, nombre_archivo)
-        elif operación == 3:
-            # Procesar archivos
-            procesar_archivos()
-        else:
-            print(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
-
-    if __name__ == "__main__":
-        main()
-# ... (Previous code from Part 1)
-
-# ... (Continuation of your functions from Part 1)
+        print(Fore.GREEN + "Archivo descifrado con éxito: " + ruta_salida + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + "Error al descifrar el archivo: " + str(e) + Style.RESET_ALL)
 
 def procesar_archivos():
     print(Fore.GREEN + "Ingrese la operación - 1 para Cifrar, 2 para Descifrar:" + Style.RESET_ALL)
@@ -219,6 +155,9 @@ def procesar_archivos():
         descifrar_archivo(ruta_archivo, ruta_salida, contraseña)
     else:
         print(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
+
+# ... (Continúa con cualquier otra función que necesites)
+# ... (Continuación de tus funciones desde la Parte 2)
 
 def main():
     print(Fore.GREEN + "Elija una operación - 1 para Cifrar, 2 para Descifrar, 3 para Procesar Archivos:" + Style.RESET_ALL)
@@ -253,8 +192,6 @@ def main():
             resultado = encrypt_decrypt(texto, método, palabra_clave, True)
         elif operación == 2:
             resultado = encrypt_decrypt(texto, método, palabra_clave, False)
-        else:
-            raise ValueError(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
 
         print(Fore.MAGENTA + "\nResultado:\n" + resultado + Style.RESET_ALL)
 
@@ -268,31 +205,10 @@ def main():
         print(Fore.RED + "Operación no válida seleccionada." + Style.RESET_ALL)
 
 if __name__ == "__main__":
-    main()
-# ... (Previous code from Part 2)
+    # Generate a random Fernet key
+    key = Fernet.generate_key()
 
-# ... (Continuation of your functions from Part 2)
+    # Print the key (you can save it for later use)
+    print(key.decode())
 
-def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
-  
-    try:
-        # Leer el contenido cifrado del archivo
-        with open(ruta_archivo, 'rb') as archivo:
-            datos_cifrados = archivo.read()
-
-        # Descifrar el contenido del archivo
-        suite_cifrado = Fernet(key)
-        datos_descifrados = suite_cifrado.decrypt(datos_cifrados)
-
-        # Escribir el contenido descifrado en un nuevo archivo
-        with open(ruta_salida, 'wb') as archivo_descifrado:
-            archivo_descifrado.write(datos_descifrados)
-
-        print(Fore.GREEN + "Archivo descifrado con éxito: " + ruta_salida + Style.RESET_ALL)
-    except Exception as e:
-        print(Fore.RED + "Error al descifrar el archivo: " + str(e) + Style.RESET_ALL)
-
-# ... (Continuation of your functions)
-
-if __name__ == "__main__":
     main()
