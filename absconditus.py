@@ -1,7 +1,5 @@
 import subprocess
 import sys
-import os
-import mimetypes
 from colorama import Fore, Style
 from cryptography.fernet import Fernet
 
@@ -66,6 +64,36 @@ def vigenere_cipher_encrypt(texto, palabra_clave):
         else:
             resultado.append(carácter)
     return ''.join(resultado)
+
+def vigenere_cipher_decrypt(texto, palabra_clave):
+    resultado = []
+    longitud_palabra_clave = len(palabra_clave)
+    for i, carácter in enumerate(texto):
+        if carácter.isalpha():
+            desplazamiento = ord(palabra_clave[i % longitud_palabra_clave].lower()) - ord('a')
+            if carácter.islower():
+                resultado.append(chr(((ord(carácter) - ord('a') - desplazamiento) % 26) + ord('a')))
+            else:
+                resultado.append(chr(((ord(carácter) - ord('A') - desplazamiento) % 26) + ord('A')))
+        else:
+            resultado.append(carácter)
+    return ''.join(resultado)
+
+def caesar_cipher(texto, desplazamiento, cifrar=True):
+    resultado = []
+    for carácter in texto:
+        if carácter.isalpha():
+            if carácter.islower():
+                resultado.append(chr(((ord(carácter) - ord('a') + desplazamiento) % 26) + ord('a')) if cifrar else chr(((ord(carácter) - ord('a') - desplazamiento) % 26) + ord('a')))
+            else:
+                resultado.append(chr(((ord(carácter) - ord('A') + desplazamiento) % 26) + ord('A')) if cifrar else chr(((ord(carácter) - ord('A') - desplazamiento) % 26) + ord('A')))
+        else:
+            resultado.append(carácter)
+    return ''.join(resultado)
+
+def reverse_cipher(texto, cifrar=True):
+    return texto[::-1] if cifrar else texto[::-1]
+
 
 # ... (The rest of your functions)
 
@@ -280,7 +308,7 @@ def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
         suite_cifrado = Fernet(contraseña)
         datos_descifrados = suite_cifrado.decrypt(datos_cifrados)
 
-        # Escribir el contenido descifrado en un nuevo archivo
+        # Escribir el contenido descifrado en un nuevo archiavo
         with open(ruta_salida, 'wb') as archivo_descifrado:
             archivo_descifrado.write(datos_descifrados)
 
@@ -291,4 +319,4 @@ def descifrar_archivo(ruta_archivo, ruta_salida, contraseña):
 # ... (Continuation of your functions)
 
 if __name__ == "__main__":
-    main()
+    main() 
