@@ -22,6 +22,7 @@ for paquete in paquetes_requeridos:
 try:
     import colorama
     from colorama import Fore, Style
+from cryptography.fernet import Fernet
 except ImportError:
     print("Colorama no está instalado y no se puede instalar automáticamente.")
     sys.exit(1)
