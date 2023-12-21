@@ -1,3 +1,4 @@
+from cryptography.fernet import Fernet
 import subprocess
 import sys
 import os
